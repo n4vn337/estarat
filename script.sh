@@ -19,9 +19,14 @@ echo origin/amass.txt> origin/origin_subs.txt; echo origin/subfinder.txt> origin
 uniq origin/origin_subs.txt> origin/hosts.txt
 cat origin/hosts.txt | httpx -silent> origin/subs.txt
 cp origin/subs.txt check_me/subs.txt
-
 #sed -r 's/$/.$IP/' -i all.txt
 #massdns -r lists/resolvers.txt -t CNAME all.txt -o s > results
+
+
+# screenshot
+# ----------
+
+cat check_me/subs.txt | aquatone -chrome-path /root/hacking/chromium-latest-linux/latest/chrome
 
 
 # service enum/ port scan
@@ -44,9 +49,4 @@ while read -r line; do python linkfinder.py -i "https://$line" -d -o cli; done<~
 
 # echo "www.$IP" | otxurls
 # echo "www.$IP" | waybackurls
-
-# screenshot
-# ----------
-
-cat check_me/subs.txt | aquatone -chrome-path /root/hacking/chromium-latest-linux/latest/chrome
 
