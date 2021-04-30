@@ -4,23 +4,23 @@
 # prereqs
 # -------
 
-$IP=$1
+# $IP=$1
 
-mkdir -p $IP/check_me $IP/origin
-
+mkdir -p $1/check_me $1/origin
+cd $1
 
 # subdomain enum
 # --------------
 
-amass enum -d $IP > origin/amass.txt
-subfinder -d $IP -t 25 -timeout 5 -silent > origin/subfinder.txt
+/snap/bin/amass enum -d $1 > amass.txt
+subfinder -d $1 -t 25 -timeout 5 -silent > subfinder.txt
 
-altdns -i check_me/subs.txt -o data_output -w ~/tools/words.txt -r -s origin/altdns.txt
+altdns -i check_me/subs.txt -o data_output -w ~/tools/words.txt -r -s altdns.txt
 
-echo origin/amass.txt> origin/origin_subs.txt; echo origin/subfinder.txt> origin/origin_subs.txt; echo origin/altdns.txt> origin/origin_subs.txt
-uniq origin/origin_subs.txt> origin/hosts.txt
-cat origin/hosts.txt | httpx -silent> origin/subs.txt
-#sed -r 's/$/.$IP/' -i all.txt
+echo amass.txt> origin_subs.txt; echo subfinder.txt> origin_subs.txt; echo altdns.txt> origin_subs.txt
+uniq origin_subs.txt> hosts.txt
+cat hosts.txt | httpx -silent> subs.txt
+#sed -r 's/$/.$1/' -i all.txt
 #massdns -r lists/resolvers.txt -t CNAME all.txt -o s > results
 
 
@@ -33,8 +33,8 @@ cat check_me/subs.txt | aquatone -chrome-path ~/tools/latest/chrome -out aquaton
 # vulns
 # ------------------
 
-subjack -w check_me/subs.txt -t 100 -timeout 30 -o origin/subjack.txt -ssl
-# cat origin/subjack.txt | 
+subjack -w check_me/subs.txt -t 100 -timeout 30 -o subjack.txt -ssl
+# cat subjack.txt | 
 
 nuclei -l chec_me/subs.txt -t ~/tools/nuclei-templates/*/
 
@@ -43,25 +43,25 @@ nuclei -l chec_me/subs.txt -t ~/tools/nuclei-templates/*/
 # -----------------------
 
 # while read -r line; do masscan -p1-65535 $(dig +short $line) --rate 10000; done < subs.txt|tee ports
-# while read -r line; do nmap -sV -p <ports from masscan> $IP --min-rate=10000; done < subs.txt
+# while read -r line; do nmap -sV -p <ports from masscan> $1 --min-rate=10000; done < subs.txt
 
-cat check_me/subs.txt | naabu -nmap-cli 'nmap -sV -oX origin/naabu.txt'
+cat check_me/subs.txt | naabu -nmap-cli 'nmap -sV -oX naabu.txt'
 
 
 # links to check
 # --------------
 
-# linkfinder -i "https://www.$IP/" -d -o cli
-while read -r line; do python linkfinder.py -i "https://$line" -d -o cli; done< check_me/subs.txt | tee origin/linkfinder.txt
+# linkfinder -i "https://www.$1/" -d -o cli
+while read -r line; do python linkfinder.py -i "https://$line" -d -o cli; done< check_me/subs.txt | tee linkfinder.txt
 
-# echo "www.$IP" | otxurls
-# echo "www.$IP" | waybackurls
+# echo "www.$1" | otxurls
+# echo "www.$1" | waybackurls
 
 
 copying files to check_me
 -------------------------
 
-cp origin/subs.txt check_me/subs.txt
-cp origin/subjack.txt check_me/origin/subjack.txt
-cp origin/naabu.txt check_me/naabu.txt
-cp origin/linkfinder.txt check_me/linkfinder.txt
+cp subs.txt check_me/subs.txt
+cp subjack.txt check_me/subjack.txt
+cp naabu.txt check_me/naabu.txt
+cp linkfinder.txt check_me/linkfinder.txt
